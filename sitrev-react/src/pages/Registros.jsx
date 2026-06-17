@@ -7,6 +7,12 @@ export default function Registros() {
   const token = localStorage.getItem('access_token');
 
   useEffect(() => {
+    // Se o token sumiu por algum motivo
+    if (!token) {
+      console.warn("Token não encontrado no localStorage");
+      return;
+    }
+
     fetch(`${import.meta.env.VITE_API_URL}/viagens/`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })

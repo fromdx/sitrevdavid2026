@@ -21,7 +21,7 @@ from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),#admin.site.dirname or
+    path('admin/', admin.site.urls), #admin.site.dirname or
     
     # Rotas de Autenticação JWT para o React fazer login
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

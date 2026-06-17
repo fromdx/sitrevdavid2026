@@ -9,9 +9,12 @@ export default function Veiculos() {
   const [veiculoSelecionado, setVeiculoSelecionado] = useState(null);
   const token = localStorage.getItem('access_token');
 
-  // 1. CORRIGIDO: Adicionado /veiculos/ e o "$" antes de {busca}
   useEffect(() => {
-    if (!token) return;
+    // Se o token sumiu por algum motivo
+    if (!token) {
+      console.warn("Token não encontrado no localStorage");
+      return;
+    }
 
     fetch(`${import.meta.env.VITE_API_URL}/veiculos/?search=${busca}`, {
       headers: { 

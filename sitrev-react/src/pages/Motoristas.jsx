@@ -6,7 +6,7 @@ export default function Motoristas() {
   const token = localStorage.getItem('access_token');
 
   useEffect(() => {
-    // Se o token sumiu por algum motivo, nem faz a requisição
+    // Se o token sumiu por algum motivo
     if (!token) {
       console.warn("Token não encontrado no localStorage");
       return;
