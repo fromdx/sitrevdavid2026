@@ -1,0 +1,312 @@
+[
+{
+    "model": "auth.group",
+    "fields": {
+        "name": "Super Admin",
+        "permissions": [
+            [
+                "add_logentry",
+                "admin",
+                "logentry"
+            ],
+            [
+                "change_logentry",
+                "admin",
+                "logentry"
+            ],
+            [
+                "delete_logentry",
+                "admin",
+                "logentry"
+            ],
+            [
+                "view_logentry",
+                "admin",
+                "logentry"
+            ],
+            [
+                "add_group",
+                "auth",
+                "group"
+            ],
+            [
+                "change_group",
+                "auth",
+                "group"
+            ],
+            [
+                "delete_group",
+                "auth",
+                "group"
+            ],
+            [
+                "view_group",
+                "auth",
+                "group"
+            ],
+            [
+                "add_permission",
+                "auth",
+                "permission"
+            ],
+            [
+                "change_permission",
+                "auth",
+                "permission"
+            ],
+            [
+                "delete_permission",
+                "auth",
+                "permission"
+            ],
+            [
+                "view_permission",
+                "auth",
+                "permission"
+            ],
+            [
+                "add_user",
+                "auth",
+                "user"
+            ],
+            [
+                "change_user",
+                "auth",
+                "user"
+            ],
+            [
+                "delete_user",
+                "auth",
+                "user"
+            ],
+            [
+                "view_user",
+                "auth",
+                "user"
+            ],
+            [
+                "add_contenttype",
+                "contenttypes",
+                "contenttype"
+            ],
+            [
+                "change_contenttype",
+                "contenttypes",
+                "contenttype"
+            ],
+            [
+                "delete_contenttype",
+                "contenttypes",
+                "contenttype"
+            ],
+            [
+                "view_contenttype",
+                "contenttypes",
+                "contenttype"
+            ],
+            [
+                "add_session",
+                "sessions",
+                "session"
+            ],
+            [
+                "change_session",
+                "sessions",
+                "session"
+            ],
+            [
+                "delete_session",
+                "sessions",
+                "session"
+            ],
+            [
+                "view_session",
+                "sessions",
+                "session"
+            ],
+            [
+                "add_motorista",
+                "sitrev",
+                "motorista"
+            ],
+            [
+                "change_motorista",
+                "sitrev",
+                "motorista"
+            ],
+            [
+                "delete_motorista",
+                "sitrev",
+                "motorista"
+            ],
+            [
+                "view_motorista",
+                "sitrev",
+                "motorista"
+            ],
+            [
+                "add_veiculo",
+                "sitrev",
+                "veiculo"
+            ],
+            [
+                "change_veiculo",
+                "sitrev",
+                "veiculo"
+            ],
+            [
+                "delete_veiculo",
+                "sitrev",
+                "veiculo"
+            ],
+            [
+                "view_veiculo",
+                "sitrev",
+                "veiculo"
+            ],
+            [
+                "add_viagem",
+                "sitrev",
+                "viagem"
+            ],
+            [
+                "change_viagem",
+                "sitrev",
+                "viagem"
+            ],
+            [
+                "delete_viagem",
+                "sitrev",
+                "viagem"
+            ],
+            [
+                "view_viagem",
+                "sitrev",
+                "viagem"
+            ]
+        ]
+    }
+},
+{
+    "model": "auth.group",
+    "fields": {
+        "name": "Usuario",
+        "permissions": [
+            [
+                "view_group",
+                "auth",
+                "group"
+            ],
+            [
+                "view_permission",
+                "auth",
+                "permission"
+            ],
+            [
+                "view_user",
+                "auth",
+                "user"
+            ],
+            [
+                "view_contenttype",
+                "contenttypes",
+                "contenttype"
+            ],
+            [
+                "add_session",
+                "sessions",
+                "session"
+            ],
+            [
+                "view_session",
+                "sessions",
+                "session"
+            ],
+            [
+                "view_motorista",
+                "sitrev",
+                "motorista"
+            ],
+            [
+                "view_veiculo",
+                "sitrev",
+                "veiculo"
+            ],
+            [
+                "view_viagem",
+                "sitrev",
+                "viagem"
+            ]
+        ]
+    }
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$rOVsscRkn4XhZsimWq6HbO$kSQLkSFF8eV3tcYfcl2hoN0s2thRHCugVKUeQ0KQhKo=",
+        "last_login": "2026-06-15T02:18:34.779Z",
+        "is_superuser": true,
+        "username": "admin",
+        "first_name": "",
+        "last_name": "",
+        "email": "admin@admin.com",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2026-06-15T01:33:11.168Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "password": "pbkdf2_sha256$1200000$D27nJuaNd8HGPzBl5AanUy$1fgGGGFeHGMS6f+56b2N3Oy42NQWNde2anM8Q3bPDdY=",
+        "last_login": null,
+        "is_superuser": false,
+        "username": "user1",
+        "first_name": "",
+        "last_name": "",
+        "email": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2026-06-16T19:59:43.945Z",
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "sessions.session",
+    "pk": "a6b0qae4epomgj61hoy3v3podhzgb1yi",
+    "fields": {
+        "session_data": ".eJxVjEEOwiAQAP-yZ0MKlLL06N03kAUWqRpISnsy_t006UGvM5N5g6d9K37vvPolwQwSLr8sUHxyPUR6UL03EVvd1iWIIxGn7eLWEr-uZ_s3KNQLzKAVRhUJh8yEkzNaWWkPYsfAbsIseZQZKTMOWaEzEypKGm00ZpA8wucL3WI3iA:1wYwuI:vnqBkagB9Ot9SrGDDwOclaJ2kxO3lzv6RZArGrKC0SA",
+        "expire_date": "2026-06-29T02:18:34.786Z"
+    }
+},
+{
+    "model": "sitrev.motorista",
+    "pk": 1,
+    "fields": {
+        "nome": "Marcos Ferreira"
+    }
+},
+{
+    "model": "sitrev.veiculo",
+    "pk": 1,
+    "fields": {
+        "modelo": "Onix",
+        "placa": "TVZ5J34",
+        "imagem": ""
+    }
+},
+{
+    "model": "sitrev.viagem",
+    "pk": 1,
+    "fields": {
+        "veiculo": 1,
+        "motorista": 1,
+        "inicio_viagem": "2026-06-15T01:39:28Z",
+        "fim_viagem": "2026-06-15T01:45:36Z",
+        "rastro_gps": "[[-3.766, -49.673], [-3.758, -49.665], [-3.745, -49.652]]"
+    }
+}
+]
