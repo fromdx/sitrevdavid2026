@@ -8,15 +8,15 @@ export default function Veiculos() {
   const [historico, setHistorico] = useState([]);
   const [veiculoSelecionado, setVeiculoSelecionado] = useState(null);
   const token = localStorage.getItem('access_token');
-
-  // 1. Busca a lista de veículos cadastrados filtrados pela busca genérica
+  
   useEffect(() => {
     // Se o token sumiu por algum motivo
     if (!token) {
       console.warn("Token não encontrado no localStorage");
       return;
     }
-
+    
+    // 1. Busca a lista de veículos cadastrados filtrados pela busca genérica
     fetch(`${import.meta.env.VITE_API_URL}/veiculos/?search=${busca}`, {
       headers: { 
         'Authorization': `Bearer ${token}`,
