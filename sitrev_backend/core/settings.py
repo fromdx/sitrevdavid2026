@@ -153,8 +153,13 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 STORAGES = {
+# Motor para arquivos estáticos (CSS/JS do WhiteNoise no Admin)
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+    # Motor para arquivos de upload (fotos dos veículos)
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
 }
 
