@@ -1,12 +1,12 @@
 #from django.shortcuts import render
 
 from django.contrib.auth.models import User
-from rest_framework import viewsets, filters
-from rest_framework.decorators import action
+from rest_framework import viewsets, filters, status
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAdminUser # Garante a trava de admin
+from rest_framework.permissions import IsAuthenticated, IsAdminUser # Garante a trava de admin
 from .models import Motorista, Veiculo, Viagem
-from .serializers import MotoristaSerializer, VeiculoSerializer, ViagemSerializer, UserRegistrationSerializer
+from .serializers import MotoristaSerializer, VeiculoSerializer, ViagemSerializer, UserRegistrationSerializer, PasswordChangeSerializer
 # Importa a permissão exclusiva de administrador
 from rest_framework.permissions import IsAdminUser
 
@@ -17,6 +17,21 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
     
     # Apenas tokens assinados como administrador podem acessar esta rota
     permission_classes = [IsAdminUser]
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def alterar_minha_senha(request):
+    serializer = PasswordChangeSerializer(data=request.data, context={'request': request})
+    
+    if serializer.is_valid():
+        user = request.user
+        user.set_password(serializer.validated_data['nova_senha'])
+        user.save()
+        return Response({"detail": "Senha alterada com sucesso!"}, status=status.HTTP_200_OK)
+        
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class MotoristaViewSet(viewsets.ModelViewSet):
     queryset = Motorista.objects.all()

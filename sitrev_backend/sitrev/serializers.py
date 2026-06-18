@@ -25,6 +25,16 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     is_superuser = serializers.BooleanField(default=False)
 
+class PasswordChangeSerializer(serializers.Serializer):
+    senha_atual = serializers.CharField(required=True, write_only=True)
+    nova_senha = serializers.CharField(required=True, write_only=True)
+
+    def validate_senha_atual(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("A senha atual digitada está incorreta.")
+        return value
+
     class Meta:
         model = User
         fields = ['id', 'username', 'password', 'is_superuser']
