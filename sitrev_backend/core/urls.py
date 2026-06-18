@@ -18,8 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import alterar_minha_senha
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, alterar_minha_senha
 from sitrev.serializers import MyTokenObtainPairSerializer
 
 # Modificação para retornar 'tipo de usuario'
