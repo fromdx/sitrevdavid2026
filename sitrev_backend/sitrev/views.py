@@ -3,8 +3,19 @@
 from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser # Garante a trava de admin
 from .models import Motorista, Veiculo, Viagem
-from .serializers import MotoristaSerializer, VeiculoSerializer, ViagemSerializer
+from .serializers import MotoristaSerializer, VeiculoSerializer, ViagemSerializer, UserRegistrationSerializer
+# Importa a permissão exclusiva de administrador
+from rest_framework.permissions import IsAdminUser
+
+
+class UserRegistrationViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserRegistrationSerializer
+    
+    # Apenas tokens assinados como administrador podem acessar esta rota
+    permission_classes = [IsAdminUser]
 
 class MotoristaViewSet(viewsets.ModelViewSet):
     queryset = Motorista.objects.all()
@@ -29,3 +40,10 @@ class VeiculoViewSet(viewsets.ModelViewSet):
 class ViagemViewSet(viewsets.ModelViewSet):
     queryset = Viagem.objects.order_by('-inicio_viagem')
     serializer_class = ViagemSerializer
+
+class AdminDashboardViewSet(viewsets.ModelViewSet):
+    queryset = Motorista.objects.all()
+    serializer_class = MotoristaSerializer
+    
+    # Trava de Segurança: Bloqueia na hora se um usuário comum tentar acessar o link
+    permission_classes = [IsAdminUser] 

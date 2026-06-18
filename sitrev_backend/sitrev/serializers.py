@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Motorista, Veiculo, Viagem
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -18,6 +19,32 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             data['role'] = 'comum'
             
         return data
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    # Força a senha a ser um campo apenas de escrita (nunca retornará no JSON por segurança)
+    password = serializers.CharField(write_only=True)
+    is_superuser = serializers.BooleanField(default=False)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password', 'is_superuser']
+
+    def create(self, validated_data):
+        # Extrai os dados validados
+        username = validated_data['username']
+        password = validated_data['password']
+        is_superuser = validated_data.get('is_superuser', False)
+
+        # Cria o usuário com a senha criptografada de forma nativa
+        user = User.objects.create_user(username=username, password=password)
+        
+        # Se for marcado como administrador, concede as permissões de acesso
+        if is_superuser:
+            user.is_superuser = True
+            user.is_staff = True  # Permite acessar o painel /admin/ também
+            
+        user.save()
+        return user
 
 class MotoristaSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()

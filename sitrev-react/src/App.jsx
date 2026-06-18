@@ -8,6 +8,7 @@ import PrivateRoute from './components/PrivateRoute';
 function Navbar() {
   const navigate = useNavigate();
   const token = localStorage.getItem('access_token');
+  const role = localStorage.getItem('user_role'); // Captura a função do usuário
   
   if (!token) return null;
 
@@ -17,6 +18,10 @@ function Navbar() {
         <Link to="/motoristas" style={{ color: 'white', marginRight: '15px', textDecoration: 'none' }}>Motoristas</Link>
         <Link to="/veiculos" style={{ color: 'white', marginRight: '15px', textDecoration: 'none' }}>Veículos</Link>
         <Link to="/registros" style={{ color: 'white', textDecoration: 'none' }}>Registros</Link>
+        {/*Só renderiza o link se for administrador */}
+        {role === 'administrador' && (
+          <Link to="/admin-dashboard" style={{ color: '#f6ad55', fontWeight: 'bold', textDecoration: 'none' }}>🛡️ Administrador</Link>
+        )}
       </div>
       <button onClick={() => { localStorage.clear(); navigate('/login'); }} style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}>Sair</button>
     </nav>
@@ -36,6 +41,8 @@ export default function App() {
           <Route path="/veiculos" element={<Veiculos />} />
           <Route path="/registros" element={<Registros />} />
           <Route path="*" element={<Motoristas />} /> {/* Redirecionamento padrão */}
+          {/* Nova rota da página do administrador */}
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>

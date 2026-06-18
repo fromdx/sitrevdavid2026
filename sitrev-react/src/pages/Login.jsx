@@ -19,6 +19,9 @@ export default function Login() {
 
       const data = await response.json();
       localStorage.setItem('access_token', data.access); // Salva o token JWT
+      // opcional
+      localStorage.setItem('user_role', data.role); // Salva o cargo: 'administrador' ou 'comum'
+      //
       navigate('/motoristas'); // Redireciona para o sistema
     } catch (err) {
       alert(err.message);
