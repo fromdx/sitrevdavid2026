@@ -1,17 +1,23 @@
 import { useState, useEffect } from 'react';
 
 export default function AdminDashboard() {
-  const [usuarios, setUsuarios] = useState([]);
   const [metricas, setMetricas] = useState({ totalMotoristas: 0, totalVeiculos: 0, viagensAtivas: 0 });
-  const [novoUsuario, setNovoUsuario] = useState({ username: '', password: '', is_superuser: false });
-  const [mensagem, setMensagem] = useState({ texto: '', erro: false });
+  const [abaAtiva, setAbaAtiva] = useState('usuario'); // Controla qual formulário exibir
   const token = localStorage.getItem('access_token');
 
-  // 1. Carrega dados gerenciais e lista de usuários cadastrados no Neon
-  useEffect(() => {
+  // Estados dos formulários
+  const [novoUsuario, setNovoUsuario] = useState({ username: '', password: '', is_superuser: false });
+  const [novoMotorista, setNovoMotorista] = useState({ nome: '' });
+  const [novoVeiculo, setNovoVeiculo] = useState({ modelo: '', placa: '' });
+  const [imagemVeiculo, setImagemVeiculo] = useState(null);
+
+  // Estado de feedback
+  const [mensagem, setMensagem] = useState({ texto: '', erro: false });
+
+  // 1. Carrega dados gerenciais para os cards de indicadores
+  const carregarMetricas = () => {
     if (!token) return;
 
-    // Busca dados dos motoristas para calcular métricas de status
     fetch(`${import.meta.env.VITE_API_URL}/motoristas/`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
@@ -20,151 +26,277 @@ export default function AdminDashboard() {
       const ativos = motoristas.filter(m => m.status === 'Em viagem').length;
       setMetricas(prev => ({ ...prev, totalMotoristas: motoristas.length, viagensAtivas: ativos }));
     })
-    .catch(err => console.error("Erro ao carregar métricas:", err));
+    .catch(err => console.error(err));
 
-    // Busca dados de frotas
     fetch(`${import.meta.env.VITE_API_URL}/veiculos/`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
     .then(res => res.json())
-    .then(veiculos => {
-      setMetricas(prev => ({ ...prev, totalVeiculos: veiculos.length }));
-    })
-    .catch(err => console.error("Erro ao carregar frotas:", err));
+    .then(veiculos => setMetricas(prev => ({ ...prev, totalVeiculos: veiculos.length })))
+    .catch(err => console.error(err));
+  };
 
-    // Opcional: Se houver um endpoint customizado /api/usuarios/, carregaria aqui
+  useEffect(() => {
+    carregarMetricas();
   }, [token]);
 
-  // 2. FUNÇÃO DE CADASTRO (Sign Up): Envia os novos dados para o Django
-  const handleCadastro = async (e) => {
+  // 2. CADASTRO DE USUÁRIO (JSON)
+  const handleCadastroUsuario = async (e) => {
     e.preventDefault();
     setMensagem({ texto: '', erro: false });
-
     try {
-      // Criaremos esta rota '/usuarios/' no Django no próximo passo
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/usuarios/`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(novoUsuario)
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Erro ao cadastrar usuário.');
+      
+      setMensagem({ texto: `✅ Usuário "${novoUsuario.username}" registrado!`, erro: false });
+      setNovoUsuario({ username: '', password: '', is_superuser: false });
+    } catch (err) { setMensagem({ texto: `❌ ${err.message}`, erro: true }); }
+  };
 
-      const data = await response.json();
+  // 3. CADASTRO DE MOTORISTA (JSON)
+  const handleCadastroMotorista = async (e) => {
+    e.preventDefault();
+    setMensagem({ texto: '', erro: false });
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/motoristas/`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(novoMotorista)
+      });
+      if (!res.ok) throw new Error('Falha ao cadastrar motorista.');
+      
+      setMensagem({ texto: `✅ Motorista "${novoMotorista.nome}" cadastrado com sucesso!`, erro: false });
+      setNovoMotorista({ nome: '' });
+      carregarMetricas();
+    } catch (err) { setMensagem({ texto: `❌ ${err.message}`, erro: true }); }
+  };
 
-      if (!response.ok) {
-        throw new Error(data.detail || 'Falha ao cadastrar usuário. Verifique os dados.');
+  // 4. CADASTRO DE VEÍCULO (FormData - Necessário para Upload de Imagem)
+  const handleCadastroVeiculo = async (e) => {
+    e.preventDefault();
+    setMensagem({ texto: '', erro: false });
+    try {
+      const formData = new FormData();
+      formData.append('modelo', novoVeiculo.modelo);
+      formData.append('placa', novoVeiculo.placa);
+      if (imagemVeiculo) {
+        formData.append('imagem', imagemVeiculo);
       }
 
-      setMensagem({ texto: `✅ Usuário "${novoUsuario.username}" cadastrado com sucesso!`, erro: false });
-      setNovoUsuario({ username: '', password: '', is_superuser: false }); // Limpa o formulário
-    } catch (err) {
-      setMensagem({ texto: `❌ ${err.message}`, erro: true });
-    }
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/veiculos/`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` }, // Sem 'Content-Type', o navegador define o Boundary do arquivo sozinho
+        body: formData
+      });
+      if (!res.ok) throw new Error('Falha ao cadastrar veículo. Verifique se a placa já existe.');
+      
+      setMensagem({ texto: `✅ Veículo "${novoVeiculo.modelo}" [${novoVeiculo.placa}] cadastrado!`, erro: false });
+      setNovoVeiculo({ modelo: '', placa: '' });
+      setImagemVeiculo(null);
+      carregarMetricas();
+    } catch (err) { setMensagem({ texto: `❌ ${err.message}`, erro: true }); }
   };
 
   return (
     <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
       
-      {/* Cabeçalho */}
       <div style={{ marginBottom: '30px', borderBottom: '2px solid #e2e8f0', paddingBottom: '15px' }}>
         <h2>🛡️ Painel de Controle do Administrador</h2>
-        <p style={{ color: '#4a5568' }}>Gerenciamento de acessos, cadastros e indicadores globais do SITREV.</p>
+        <p style={{ color: '#4a5568' }}>Gerenciamento global de frotas, condutores e credenciais de acesso.</p>
       </div>
 
-      {/* BLOCO 1: Indicadores / Métricas Rápidas */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '40px' }}>
-        <div style={{ background: '#ebf8ff', borderLeft: '4px solid #3182ce', padding: '20px', borderRadius: '4px' }}>
-          <h4 style={{ color: '#2b6cb0', textTransform: 'uppercase', fontSize: '12px' }}>Total de Motoristas</h4>
-          <p style={{ fontSize: '28px', fontWeight: 'bold', marginTop: '5px' }}>{metricas.totalMotoristas}</p>
+      {/* Indicadores Gerenciais */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+        <div style={{ background: '#ebf8ff', borderLeft: '4px solid #3182ce', padding: '15px', borderRadius: '4px' }}>
+          <h4 style={{ color: '#2b6cb0', fontSize: '11px', textTransform: 'uppercase' }}>Condutores</h4>
+          <p style={{ fontSize: '24px', fontWeight: 'bold' }}>{metricas.totalMotoristas}</p>
         </div>
-        <div style={{ background: '#e6fffa', borderLeft: '4px solid #319795', padding: '20px', borderRadius: '4px' }}>
-          <h4 style={{ color: '#234e52', textTransform: 'uppercase', fontSize: '12px' }}>Frota Cadastrada</h4>
-          <p style={{ fontSize: '28px', fontWeight: 'bold', marginTop: '5px' }}>{metricas.totalVeiculos}</p>
+        <div style={{ background: '#e6fffa', borderLeft: '4px solid #319795', padding: '15px', borderRadius: '4px' }}>
+          <h4 style={{ color: '#234e52', fontSize: '11px', textTransform: 'uppercase' }}>Veículos</h4>
+          <p style={{ fontSize: '24px', fontWeight: 'bold' }}>{metricas.totalVeiculos}</p>
         </div>
-        <div style={{ background: '#f0fff4', borderLeft: '4px solid #38a169', padding: '20px', borderRadius: '4px' }}>
-          <h4 style={{ color: '#22543d', textTransform: 'uppercase', fontSize: '12px' }}>Viagens em Andamento</h4>
-          <p style={{ fontSize: '28px', fontWeight: 'bold', marginTop: '5px' }}>🟢 {metricas.viagensAtivas}</p>
+        <div style={{ background: '#f0fff4', borderLeft: '4px solid #38a169', padding: '15px', borderRadius: '4px' }}>
+          <h4 style={{ color: '#22543d', fontSize: '11px', textTransform: 'uppercase' }}>Em Viagem</h4>
+          <p style={{ fontSize: '24px', fontWeight: 'bold', color: '#2f855a' }}>🟢 {metricas.viagensAtivas}</p>
         </div>
       </div>
 
-      {/* BLOCO 2: Layout em Duas Colunas */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+      {/* Seletor de Abas Internas do Dashboard */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', borderBottom: '1px solid #cbd5e0', paddingBottom: '10px' }}>
+        <button onClick={() => { setAbaAtiva('usuario'); setMensagem({texto:'', erro:false}); }} style={{ padding: '10px 15px', cursor: 'pointer', background: abaAtiva === 'usuario' ? '#1c3d5a' : '#e2e8f0', color: abaAtiva === 'usuario' ? 'white' : '#333', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>👤 Novo Usuário</button>
+        <button onClick={() => { setAbaAtiva('motorista'); setMensagem({texto:'', erro:false}); }} style={{ padding: '10px 15px', cursor: 'pointer', background: abaAtiva === 'motorista' ? '#1c3d5a' : '#e2e8f0', color: abaAtiva === 'motorista' ? 'white' : '#333', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>👥 Novo Motorista</button>
+        <button onClick={() => { setAbaAtiva('veiculo'); setMensagem({texto:'', erro:false}); }} style={{ padding: '10px 15px', cursor: 'pointer', background: abaAtiva === 'veiculo' ? '#1c3d5a' : '#e2e8f0', color: abaAtiva === 'veiculo' ? 'white' : '#333', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>🚗 Novo Veículo</button>
+      </div>
+
+      {/* Feedback Alert */}
+      {mensagem.texto && (
+        <div style={{ padding: '12px', marginBottom: '20px', borderRadius: '4px', background: mensagem.erro ? '#fff5f5' : '#f0fff4', color: mensagem.erro ? '#c53030' : '#22543d', fontWeight: 'bold' }}>
+          {mensagem.texto}
+        </div>
+      )}
+
+      {/* CONTEÚDO DINÂMICO DOS FORMULÁRIOS */}
+      <div style={{ background: 'white', padding: '25px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', maxWidth: '600px' }}>
         
-        {/* Coluna Esquerda: Formulário de Cadastro (Sign Up) */}
-        <div style={{ background: 'white', padding: '25px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
-          <h3 style={{ marginBottom: '20px' }}>📝 Cadastrar Novo Usuário</h3>
-          
-          {mensagem.texto && (
-            <div style={{ padding: '10px', marginBottom: '15px', borderRadius: '4px', background: fillFormMsgBg(mensagem.erro), color: fillFormMsgColor(mensagem.erro), fontWeight: 'bold' }}>
-              {mensagem.texto}
+        {/* FORMULÁRIO 1: USUÁRIO */}
+        {abaAtiva === 'usuario' && (
+          <form onSubmit={handleCadastroUsuario}>
+            <h3>📝 Registrar Operador / Admin</h3>
+            <div style={{ margin: '15px 0' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600' }}>Login de Usuário</label>
+              <input type="text" value={novoUsuario.username} onChange={e => setNovoUsuario({ ...novoUsuario, username: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #cbd5e0' }} required />
             </div>
-          )}
-
-          <form onSubmit={handleCadastro}>
-            <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600' }}>Nome de Usuário (Login)</label>
-              <input 
-                type="text" 
-                placeholder="Ex: joao.silva" 
-                value={novoUsuario.username} 
-                onChange={e => setNovoUsuario({ ...novoUsuario, username: e.target.value })}
-                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #cbd5e0' }}
-                required 
-              />
+            <div style={{ margin: '15px 0' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600' }}>Senha</label>
+              <input type="password" value={novoUsuario.password} onChange={e => setNovoUsuario({ ...novoUsuario, password: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #cbd5e0' }} required />
             </div>
+            <div style={{ margin: '20px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <input type="checkbox" id="chk" checked={novoUsuario.is_superuser} onChange={e => setNovoUsuario({ ...novoUsuario, is_superuser: e.target.checked })} style={{ width: '18px', height: '18px' }} />
+              <label htmlFor="chk" style={{ fontWeight: '600', cursor: 'pointer' }}>Conceder acesso de Administrador?</label>
+            </div>
+            <button type="submit" style={{ width: '100%', padding: '12px', background: '#1c3d5a', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Salvar Usuário</button>
+          </form>
+        )}
 
-            <div style={{ marginBottom: '15px' }}>
-              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600' }}>Senha de Acesso</label>
-              <input 
-                type="password" 
-                placeholder="Mínimo 6 caracteres" 
-                value={novoUsuario.password} 
-                onChange={e => setNovoUsuario({ ...novoUsuario, password: e.target.value })}
-                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #cbd5e0' }}
-                required 
-              />
+        {/* FORMULÁRIO 2: MOTORISTA */}
+        {abaAtiva === 'motorista' && (
+          <form onSubmit={handleCadastroMotorista}>
+            <h3>📋 Cadastrar Novo Motorista</h3>
+            <div style={{ margin: '15px 0' }}>
+              <label style={{ display: 'block', marginBottom: '5px', fontWeight: '600' }}>Nome Completo do Condutor</label>
+              <input type="text" placeholder="Ex: Carlos Alberto de Souza" value={novoMotorista.nome} onChange={e => setNovoMotorista({ nome: e.target.value })} style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #cbd5e0' }} required />
             </div>
 
-            <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <input 
-                type="checkbox" 
-                id="checkAdmin"
-                checked={novoUsuario.is_superuser} 
-                onChange={e => setNovoUsuario({ ...novoUsuario, is_superuser: e.target.checked })}
-                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-              />
-              <label htmlFor="checkAdmin" style={{ fontWeight: '600', cursor: 'pointer' }}>Este usuário será um Administrador?</label>
-            </div>
-
-            <button 
-              type="submit" 
-              style={{ width: '100%', padding: '12px', background: '#1c3d5a', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: '#1c3d5a',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
             >
-              Confirmar Registro
+              Salvar Motorista
             </button>
           </form>
-        </div>
+        )}
 
-        {/* Coluna Direita: Painel Informativo sobre Segurança de Telemetria */}
-        <div style={{ background: '#f7fafc', padding: '25px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-          <h3 style={{ marginBottom: '15px' }}>ℹ️ Informações de Governança</h3>
-          <p style={{ lineHeight: '1.6', color: '#4a5568', marginBottom: '15px' }}>
-            Como administrador do <strong>SITREV</strong>, as contas criadas através deste painel ganham acesso imediato às rotas de monitoramento geográfico de Tucuruí, Pará.
-          </p>
-          <ul style={{ paddingLeft: '20px', lineHeight: '2', color: '#4a5568' }}>
-            <li><strong>Usuários Comuns:</strong> Visualizam apenas as abas de monitoramento.</li>
-            <li><strong>Administradores:</strong> Possuem acesso a este painel e ao Django Admin.</li>
-            <li>As senhas são criptografadas em Hash (PBKDF2) antes do salvamento no Neon Postgres.</li>
-          </ul>
-        </div>
+        {/* FORMULÁRIO 3: VEÍCULO */}
+        {abaAtiva === 'veiculo' && (
+          <form onSubmit={handleCadastroVeiculo}>
+            <h3>🚗 Adicionar Veículo à Frota</h3>
 
+            <div style={{ margin: '15px 0' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '5px',
+                  fontWeight: '600'
+                }}
+              >
+                Modelo do Veículo
+              </label>
+
+              <input
+                type="text"
+                placeholder="Ex: Mercedes-Benz Axor"
+                value={novoVeiculo.modelo}
+                onChange={e =>
+                  setNovoVeiculo({
+                    ...novoVeiculo,
+                    modelo: e.target.value
+                  })
+                }
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  border: '1px solid #cbd5e0'
+                }}
+                required
+              />
+            </div>
+
+            <div style={{ margin: '15px 0' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '5px',
+                  fontWeight: '600'
+                }}
+              >
+                Placa do Veículo
+              </label>
+
+              <input
+                type="text"
+                placeholder="Ex: JXN-4E99"
+                value={novoVeiculo.placa}
+                onChange={e =>
+                  setNovoVeiculo({
+                    ...novoVeiculo,
+                    placa: e.target.value
+                  })
+                }
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  border: '1px solid #cbd5e0'
+                }}
+                required
+              />
+            </div>
+
+            <div style={{ margin: '15px 0' }}>
+              <label
+                style={{
+                  display: 'block',
+                  marginBottom: '5px',
+                  fontWeight: '600'
+                }}
+              >
+                Foto do Veículo (Opcional)
+              </label>
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => setImagemVeiculo(e.target.files[0])}
+                style={{
+                  width: '100%',
+                  padding: '5px 0'
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: '#1c3d5a',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 'bold'
+              }}
+            >
+              Salvar Veículo
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
 }
-
-// Funções auxiliares simples para estilizar a mensagem de feedback
-function fillFormMsgBg(isErro) { return isErro ? '#fff5f5' : '#f0fff4'; }
-function fillFormMsgColor(isErro) { return isErro ? '#c53030' : '#22543d'; }
