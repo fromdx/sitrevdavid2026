@@ -20,11 +20,11 @@ function Navbar() {
       <div>
         <Link to="/motoristas" style={{ color: 'white', marginRight: '15px', textDecoration: 'none' }}>Motoristas</Link>
         <Link to="/veiculos" style={{ color: 'white', marginRight: '15px', textDecoration: 'none' }}>Veículos</Link>
-        <Link to="/registros" style={{ color: 'white', textDecoration: 'none' }}>Registros</Link>
-        <Link to="/perfil" style={{ color: 'white', textDecoration: 'none' }}>Perfil</Link>
+        <Link to="/registros" style={{ color: 'white', marginRight: '15px', textDecoration: 'none' }}>Registros</Link>
+        <Link to="/perfil" style={{ color: 'white', marginRight: '15px', textDecoration: 'none' }}>Perfil</Link>
         {/*Só renderiza o link se for administrador */}
         {role === 'administrador' && (
-          <Link to="/admin-dashboard" style={{ color: '#f6ad55', fontWeight: 'bold', textDecoration: 'none' }}>🛡️ Administrador</Link>
+          <Link to="/admin-dashboard" style={{ color: '#f6ad55', marginRight: '15px', fontWeight: 'bold', textDecoration: 'none' }}>🛡️ Administrador</Link>
         )}        
       </div>
       <button onClick={() => { localStorage.clear(); navigate('/login'); }} style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}>Sair</button>
