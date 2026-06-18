@@ -3,7 +3,9 @@ import Login from './pages/Login';
 import Motoristas from './pages/Motoristas';
 import Veiculos from './pages/Veiculos';
 import Registros from './pages/Registros';
+import AdminDashboard from './pages/AdminDashboard';
 import PrivateRoute from './components/PrivateRoute';
+
 
 function Navbar() {
   const navigate = useNavigate();
