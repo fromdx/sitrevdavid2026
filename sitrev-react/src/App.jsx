@@ -4,6 +4,7 @@ import Motoristas from './pages/Motoristas';
 import Veiculos from './pages/Veiculos';
 import Registros from './pages/Registros';
 import AdminDashboard from './pages/AdminDashboard';
+import Perfil from './pages/Perfil';
 import PrivateRoute from './components/PrivateRoute';
 
 
@@ -24,6 +25,7 @@ function Navbar() {
         {role === 'administrador' && (
           <Link to="/admin-dashboard" style={{ color: '#f6ad55', fontWeight: 'bold', textDecoration: 'none' }}>🛡️ Administrador</Link>
         )}
+        <Link to="/perfil" style={{ color: 'white', textDecoration: 'none' }}>Registros</Link>
       </div>
       <button onClick={() => { localStorage.clear(); navigate('/login'); }} style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}>Sair</button>
     </nav>
@@ -45,6 +47,8 @@ export default function App() {
           <Route path="*" element={<Motoristas />} /> {/* Redirecionamento padrão */}
           {/* Nova rota da página do administrador */}
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          {/* Nova rota para troca de senha */}
+          <Route path="/perfil" element={<AdminDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>
