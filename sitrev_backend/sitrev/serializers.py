@@ -1,5 +1,23 @@
 from rest_framework import serializers
 from .models import Motorista, Veiculo, Viagem
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+# Adiciona o campo customizado de 'tipo de usuario' ao JSON de retorno de /Login
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        # Gera os tokens JWT padrão (access e refresh)
+        data = super().validate(attrs)
+
+        obj_user = self.user
+
+        # Se 'is_superuser' ou 'is_staff' for True, ele é admin. Caso contrário, comum.
+        if obj_user.is_superuser or obj_user.is_staff:
+            data['role'] = 'administrador'
+        else:
+            data['role'] = 'comum'
+            
+        return data
 
 class MotoristaSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()

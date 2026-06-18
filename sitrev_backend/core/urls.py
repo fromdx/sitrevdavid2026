@@ -20,12 +20,21 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+# Modificação para retornar 'tipo de usuario'
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+
 urlpatterns = [
     path('admin/', admin.site.urls), #admin.site.dirname or
     
-    # Rotas de Autenticação JWT para o React fazer login
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # Rotas de Autenticação JWT para o React fazer login        
+    ## Modificação para retornar token + 'tipo de usuario'
+    path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    
+    ## Rota login antiga
+    ## path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
     
     # Rotas das Abas do seu sistema
     path('api/', include('sitrev.urls')),
