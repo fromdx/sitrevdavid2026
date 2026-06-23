@@ -201,7 +201,7 @@ Note que os campos inicio_viagem, fim_viagem e rastro_gps são calculados e gere
 {
   "username": "novo.operador",
   "password": "senha_criptografada_segura",
-  "is_superuser": false // Se true, cria uma conta de Administrador. Se false, usuário comum.
+  "is_superuser": false // Se true, conta de Administrador. Se false, usuário comum.
 }
 
 ## POST /alterar-senha/
