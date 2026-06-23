@@ -8,7 +8,9 @@ Esta documentação descreve todos os endpoints disponíveis na API REST do SITR
 * Formato de Dados: JSON (exceto uploads de mídia que utilizam Multipart FormData)
 
 ------------------------------
-## 🔑 1. Autenticação e Sessão (Acesso Livre) ## POST /token/
+## 🔑 1. Autenticação e Sessão (Acesso Livre)
+
+## POST /token/
 
 * Função: Realiza o login do usuário no sistema.
 * Corpo da Requisição (JSON):
@@ -91,7 +93,9 @@ Esta documentação descreve todos os endpoints disponíveis na API REST do SITR
 * Resposta de Sucesso: 204 No Content (Vazio). [1] 
 
 ------------------------------
-## 🚗 3. Módulo Veículos (Requer Token JWT)## GET /veiculos/
+## 🚗 3. Módulo Veículos (Requer Token JWT)
+
+## GET /veiculos/
 
 * Função: Lista todos os veículos da frota.
 * Parâmetros de URL (Opcional): ?search=termo (Filtra por modelo ou placa).
