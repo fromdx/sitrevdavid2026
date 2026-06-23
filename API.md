@@ -192,7 +192,8 @@ Note que os campos inicio_viagem, fim_viagem e rastro_gps são calculados e gere
 * Função: Atualiza o trajeto de uma viagem. (Usado para anexar novos pontos de GPS ou definir a data final da viagem).
 
 ------------------------------
-## 🛡️ 5. Módulo Dashboard User/Admin ## POST /usuarios/
+## 🛡️ 5. Módulo Dashboard User/Admin
+## POST /usuarios/
 
 * Função: Cadastra uma nova conta de acesso (Sign Up) no banco do Neon (Permissão: Admin).
 * Corpo da Requisição (JSON):
