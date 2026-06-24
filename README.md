@@ -85,3 +85,9 @@ python manage.py runserver
 
 ---
 
+## 📌 Integração com a API
+
+### 👉 https://github.com/fromdx/sitrevdavid2026/blob/main/API.md
+
+---
+
