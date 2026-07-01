@@ -5,6 +5,7 @@ import Veiculos from './pages/Veiculos';
 import Registros from './pages/Registros';
 import AdminDashboard from './pages/AdminDashboard';
 import Perfil from './pages/Perfil';
+import Usuarios from './pages/Usuarios';
 import PrivateRoute from './components/PrivateRoute';
 
 
@@ -25,7 +26,10 @@ function Navbar() {
         {/*Só renderiza o link se for administrador */}
         {role === 'administrador' && (
           <Link to="/admin-dashboard" style={{ color: '#f6ad55', marginRight: '15px', fontWeight: 'bold', textDecoration: 'none' }}>🛡️ Administrador</Link>
-        )}        
+        )}
+        {role === 'administrador' && (
+          <Link to="/usuarios" style={{ color: '#fc8181', fontWeight: 'bold', marginLeft: '15px' }}>⚙️ Gerenciar Usuários</Link>
+        )}    
       </div>
       <button onClick={() => { localStorage.clear(); navigate('/login'); }} style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}>Sair</button>
     </nav>
@@ -49,6 +53,11 @@ export default function App() {
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           {/* Nova rota para troca de senha */}
           <Route path="/perfil" element={<Perfil />} />
+          <Route path="/usuarios" element={
+            localStorage.getItem('user_role') === 'administrador'
+            ? <Usuarios />
+            : <Navigate to="/motoristas" replace />
+          }/>
         </Route>
       </Routes>
     </BrowserRouter>
