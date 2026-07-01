@@ -27,9 +27,9 @@ function Navbar() {
         {role === 'administrador' && (
           <Link to="/admin-dashboard" style={{ color: '#f6ad55', marginRight: '15px', fontWeight: 'bold', textDecoration: 'none' }}>🛡️ Administrador</Link>
         )}        
-        
-        <Link to="/gerenciar-usuarios" style={{ color: '#fc8181', fontWeight: 'bold', marginLeft: '15px' }}>⚙️ Gerenciar Usuários</Link>
-           
+        {role === 'administrador' && (
+          <Link to="/gerenciar-usuarios" style={{ color: '#fc8181', marginRight: '15px', fontWeight: 'bold', textDecoration: 'none' }}>⚙️ Gerenciar Usuários</Link>
+        )}   
       </div>
       <button onClick={() => { localStorage.clear(); navigate('/login'); }} style={{ background: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}>Sair</button>
     </nav>
