@@ -81,8 +81,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-with open('_db_url.txt', 'r', encoding='utf-8') as arquivo:
-    db_url = arquivo.read()
+#with open('_db_url.txt', 'r', encoding='utf-8') as arquivo:
+#    db_url = arquivo.read()
+
+db_url = "postgresql://neondb_owner:npg_4oh9EsUdSZgC@ep-wild-wind-acqnrlaz.sa-east-1.aws.neon.tech/neondb?sslmode=require"
 
 DATABASES = {
     'default': dj_database_url.config(
