@@ -20,27 +20,16 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
 
     # Força a listagem a retornar apenas os dados seguros sem quebrar
     def list(self, request, *args, **kwargs):
-        try:
-            usuarios = User.objects.all().order_by('id')
-            dados_limpos = []
-            
-            for u in usuarios:
-                dados_limpos.append({
-                    "id": u.id,
-                    "username": u.username,
-                    "email": u.email or "",
-                    "first_name": u.first_name or "",
-                    "last_name": u.last_name or "",
-                    "is_superuser": u.is_superuser,
-                    "is_active": u.is_active,
-                    "date_joined": u.date_joined.strftime('%d/%m/%Y %H:%M') if u.date_joined else "",
-                    "last_login": u.last_login.strftime('%d/%m/%Y %H:%M') if u.last_login else "Nunca logou"
-                })
-                
-            return Response(dados_limpos, status=status.HTTP_200_OK)
-        except Exception as e:
-            # Caso ainda dê algum erro, ele retornará o texto exato do problema em vez de travar com 500 genérico
-            return Response({"detail": f"Erro interno do servidor: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        usuarios = User.objects.all().order_by('id').values(
+            'id', 
+            'username', 
+            'first_name', 
+            'last_name', 
+            'email', 
+            'is_superuser', 
+            'is_active'
+        )
+        return Response(list(usuarios), status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
