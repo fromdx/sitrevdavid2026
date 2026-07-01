@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAdminUser
 
 
 class UserRegistrationViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('id')
     serializer_class = UserRegistrationSerializer
     
     # Apenas tokens assinados como administrador podem acessar esta rota
