@@ -53,11 +53,8 @@ export default function App() {
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
           {/* Nova rota para troca de senha */}
           <Route path="/perfil" element={<Perfil />} />
-          <Route path="/gerenciar-usuarios" element={
-            localStorage.getItem('user_role') === 'administrador'
-            ? <Usuarios />
-            : <Navigate to="/motoristas" replace />
-          }/>
+          {/* Nova rota para Gestao dos Usuarios */}
+          <Route path="/gerenciar-usuarios" element={<Usuarios />} />
         </Route>
       </Routes>
     </BrowserRouter>
