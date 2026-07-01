@@ -22,12 +22,15 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         usuarios = User.objects.all().order_by('id').values(
             'id', 
-            'username', 
+            'username',
             'first_name', 
             'last_name', 
             'email', 
             'is_superuser', 
-            'is_active'
+            'is_staff', 
+            'is_active', 
+            'date_joined', 
+            'last_login'
         )
         return Response(list(usuarios), status=status.HTTP_200_OK)
 
