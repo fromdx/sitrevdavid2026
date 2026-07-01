@@ -24,6 +24,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     # Força a senha a ser um campo apenas de escrita (nunca retornará no JSON por segurança)
     password = serializers.CharField(write_only=True, required=False)
     is_superuser = serializers.BooleanField(default=False, required=False)
+    date_joined = serializers.CharField(read_only=True)
+    last_login = serializers.CharField(read_only=True)
+    is_active = serializers.BooleanField(required=False)
 
 class PasswordChangeSerializer(serializers.Serializer):
     senha_atual = serializers.CharField(required=True, write_only=True)
