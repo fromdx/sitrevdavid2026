@@ -20,8 +20,10 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
 
     # Força a listagem a retornar apenas os dados seguros sem quebrar
     def list(self, request, *args, **kwargs):
-        usuarios = User.objects.all().values('id', 'username', 'is_superuser')
-        return Response(list(usuarios), status=status.HTTP_200_OK)
+        queryset = self.get_queryset()
+        # Passa a lista pelo serializer, permitindo que TODOS os campos configurados apareçam
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
