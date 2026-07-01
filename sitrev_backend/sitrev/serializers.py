@@ -37,7 +37,21 @@ class PasswordChangeSerializer(serializers.Serializer):
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'password', 'is_superuser']
+        fields = [
+            'id', 
+            'username', 
+            'password', 
+            'first_name', 
+            'last_name', 
+            'email', 
+            'is_superuser', 
+            'is_staff', 
+            'is_active', 
+            'date_joined', 
+            'last_login'
+        ]
+        # Garante que campos automáticos de sistema sejam apenas de leitura
+        read_only_fields = ['date_joined', 'last_login']
 
     def create(self, validated_data):
         # Extrai os dados validados
@@ -46,7 +60,13 @@ class PasswordChangeSerializer(serializers.Serializer):
         is_superuser = validated_data.get('is_superuser', False)
 
         # Cria o usuário com a senha criptografada de forma nativa
-        user = User.objects.create_user(username=username, password=password)
+        user = User.objects.create_user(
+            username=username, 
+            password=password,
+            email=validated_data.get('email', ''),
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', '')
+        )
         
         # Se for marcado como administrador, concede as permissões de acesso
         if is_superuser:
