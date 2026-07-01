@@ -18,6 +18,11 @@ class UserRegistrationViewSet(viewsets.ModelViewSet):
     # Apenas tokens assinados como administrador podem acessar esta rota
     permission_classes = [IsAdminUser]
 
+    # Força a listagem a retornar apenas os dados seguros sem quebrar
+    def list(self, request, *args, **kwargs):
+        usuarios = User.objects.all().values('id', 'username', 'is_superuser')
+        return Response(list(usuarios), status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
