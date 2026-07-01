@@ -26,7 +26,7 @@ function Navbar() {
         {/*Só renderiza o link se for administrador */}
         {role === 'administrador' && (
           <Link to="/admin-dashboard" style={{ color: '#f6ad55', marginRight: '15px', fontWeight: 'bold', textDecoration: 'none' }}>🛡️ Administrador</Link>
-        )}
+        )}        
         
         <Link to="/gerenciar-usuarios" style={{ color: '#fc8181', fontWeight: 'bold', marginLeft: '15px' }}>⚙️ Gerenciar Usuários</Link>
            
@@ -59,3 +59,4 @@ export default function App() {
       </Routes>
     </BrowserRouter>
   );
+}
