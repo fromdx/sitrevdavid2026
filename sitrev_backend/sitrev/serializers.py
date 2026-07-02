@@ -28,16 +28,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     last_login = serializers.CharField(read_only=True)
     is_active = serializers.BooleanField(required=False)
 
-class PasswordChangeSerializer(serializers.Serializer):
-    senha_atual = serializers.CharField(required=True, write_only=True)
-    nova_senha = serializers.CharField(required=True, write_only=True)
-
-    def validate_senha_atual(self, value):
-        user = self.context['request'].user
-        if not user.check_password(value):
-            raise serializers.ValidationError("A senha atual digitada está incorreta.")
-        return value
-
     class Meta:
         model = User
         fields = [
@@ -78,6 +68,16 @@ class PasswordChangeSerializer(serializers.Serializer):
             
         user.save()
         return user
+
+class PasswordChangeSerializer(serializers.Serializer):
+    senha_atual = serializers.CharField(required=True, write_only=True)
+    nova_senha = serializers.CharField(required=True, write_only=True)
+
+    def validate_senha_atual(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("A senha atual digitada está incorreta.")
+        return value    
 
 class MotoristaSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
