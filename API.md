@@ -214,55 +214,146 @@ Note que os campos inicio_viagem, fim_viagem e rastro_gps são calculados e gere
 
 💡 Nota de Permissão: Todos os métodos deste módulo (GET, POST, PATCH e DELETE) são restritos exclusivamente a usuários administradores. Usuários comuns recebem o erro 403 Forbidden.
 
-## GET /usuarios/
+**Nota de Permissão:** Todas as rotas deste módulo são restritas exclusivamente a usuários com privilégios de **administrador** (`is_superuser` ou `is_staff` igual a `True`). Requisições feitas com tokens de usuários comuns retornarão o status `403 Forbidden`.
 
-* Função: Lista todos os usuários (operadores e administradores) cadastrados no sistema.
-* Resposta de Sucesso (200 OK):
+---
 
-      [
-        {
-          "id": 1,
-          "username": "admin.tucurui",
-          "is_superuser": true
-        },
-        {
-          "id": 2,
-          "username": "operador.comum",
-          "is_superuser": false
-        }
-      ]
+## Listar Todos os Usuários (READ)
+* **Verbo HTTP:** `GET`
+* **URL:** `/api/usuarios/`
+* **Cabeçalho (Headers):** 
+  * `Authorization: Bearer <TOKEN_ACCESS>`
+* **Resposta de Sucesso (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "username": "admin.tucurui",
+    "first_name": "David",
+    "last_name": "Administrador",
+    "email": "admin@sitrev.com.br",
+    "is_superuser": true
+  },
+  {
+    "id": 2,
+    "username": "operador.comum",
+    "first_name": "João",
+    "last_name": "Silva",
+    "email": "joao.silva@sitrev.com.br",
+    "is_superuser": false
+  }
+]
+```
 
-## POST /usuarios/
+---
 
-* Função: Cadastra um novo usuário (Sign Up) com senha criptografada de forma nativa.
-* Corpo da Requisição (JSON):
+## Cadastrar Novo Usuário (CREATE)
+* **Verbo HTTP:** `POST`
+* **URL:** `/api/usuarios/`
+* **Cabeçalho (Headers):** 
+  * `Authorization: Bearer <TOKEN_ACCESS>`
+  * `Content-Type: application/json`
+* **Corpo da Requisição (JSON):**
+```json
+{
+  "username": "carlos.souza",
+  "password": "senha_secreta_123",
+  "first_name": "Carlos",
+  "last_name": "Souza",
+  "email": "carlos.souza@sitrev.com.br",
+  "is_superuser": false
+}
+```
+* **Resposta de Sucesso (201 Created):**
+```json
+{
+  "id": 3,
+  "username": "carlos.souza",
+  "first_name": "Carlos",
+  "last_name": "Souza",
+  "email": "carlos.souza@sitrev.com.br",
+  "is_superuser": false
+}
+```
+*(**Segurança:** Por diretrizes de proteção de dados, a senha `password` nunca é retornada no JSON de resposta).*
 
-      {
-        "username": "novo.operador",
-        "password": "senha_criptografada_segura",
-        "is_superuser": false // Se true, cria uma conta de Administrador. Se false, usuário comum.
-      }
+---
 
-* Resposta de Sucesso (201 Created): Retorna o objeto JSON criado com o seu novo id (sem a senha por motivos de segurança).
+## Detalhes de um Usuário Específico (READ)
+* **Verbo HTTP:** `GET`
+* **URL:** `/api/usuarios/{id}/`
+* **Cabeçalho (Headers):** 
+  * `Authorization: Bearer <TOKEN_ACCESS>`
+* **Resposta de Sucesso (200 OK):**
+```json
+{
+  "id": 2,
+  "username": "operador.comum",
+  "first_name": "João",
+  "last_name": "Silva",
+  "email": "joao.silva@sitrev.com.br",
+  "is_superuser": false
+}
+```
 
+---
 
-## GET /usuarios/{id}/
+## Atualizar Dados do Usuário (UPDATE)
+* **Verbo HTTP:** `PATCH`
+* **URL:** `/api/usuarios/{id}/`
+* **Cabeçalho (Headers):** 
+  * `Authorization: Bearer <TOKEN_ACCESS>`
+  * `Content-Type: application/json`
+* **Corpo da Requisição (JSON):** Envie apenas os campos que deseja modificar.
+```json
+{
+  "first_name": "João Carlos",
+  "email": "joao.novoemail@sitrev.com.br",
+  "is_superuser": true 
+}
+```
+* **Resposta de Sucesso (200 OK):**
+```json
+{
+  "id": 2,
+  "username": "operador.comum",
+  "first_name": "João Carlos",
+  "last_name": "Silva",
+  "email": "joao.novoemail@sitrev.com.br",
+  "is_superuser": true
+}
+```
 
-* Função: Traz os detalhes de um usuário específico baseado no ID.
+---
 
-## PATCH /usuarios/{id}/
+## Forçar Nova Senha de um Usuário (Redefinição Administrativa)
+* **Verbo HTTP:** `POST`
+* **URL:** `/api/usuarios/{id}/alterar-senha/` *(A barra final é obrigatória)*
+* **Cabeçalho (Headers):** 
+  * `Authorization: Bearer <TOKEN_ACCESS>`
+  * `Content-Type: application/json`
+* **Corpo da Requisição (JSON):**
+```json
+{
+  "nova_senha": "nova_senha_ultra_secreta_99"
+}
+```
+* **Resposta de Sucesso (200 OK):**
+```json
+{
+  "detail": "A senha do usuário 'operador.comum' foi redefinida com sucesso!"
+}
+```
 
-* Função: Atualiza um campo ou cargo do usuário (ex: promover um usuário comum a administrador).
-* Corpo da Requisição (JSON): Enviar apenas a chave que deseja mudar.
+---
 
-      {
-        "is_superuser": true
-      }
+## Excluir Conta de Usuário (DELETE)
+* **Verbo HTTP:** `DELETE`
+* **URL:** `/api/usuarios/{id}/`
+* **Cabeçalho (Headers):** 
+  * `Authorization: Bearer <TOKEN_ACCESS>`
+* **Resposta de Sucesso (204 No Content):**
 
-## DELETE /usuarios/{id}/
-
-* Função: Exclui/Bane o usuário do banco de dados do Neon, removendo seu acesso ao sistema.
-* Resposta de Sucesso: 204 No Content (Vazio).
 
 ------------------------------
 # ⚠️ Padrões de Erro da API
