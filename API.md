@@ -212,7 +212,6 @@ Note que os campos inicio_viagem, fim_viagem e rastro_gps são calculados e gere
 * 200 OK: {"detail": "Senha alterada com sucesso!"}
 * 400 Bad Request: {"senha_atual": ["A senha atual digitada está incorreta."]}
 
-💡 Nota de Permissão: Todos os métodos deste módulo (GET, POST, PATCH e DELETE) são restritos exclusivamente a usuários administradores. Usuários comuns recebem o erro 403 Forbidden.
 
 **Nota de Permissão:** Todas as rotas deste módulo são restritas exclusivamente a usuários com privilégios de **administrador** (`is_superuser` ou `is_staff` igual a `True`). Requisições feitas com tokens de usuários comuns retornarão o status `403 Forbidden`.
 
