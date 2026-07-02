@@ -49,6 +49,29 @@ def alterar_minha_senha(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+#ADAPTAÇÃO: Rota customizada para o Admin redefinir a senha de terceiros
+#URL gerada automaticamente: POST /api/usuarios/{id}/alterar-senha/
+@action(detail=True, methods=['post'], url_path='alterar-senha')
+def admin_alterar_senha(self, request, pk=None):
+    usuario = self.get_object() # Busca o usuário correspondente ao ID passado na URL
+    nova_senha = request.data.get('nova_senha')
+
+    if not nova_senha or len(nova_senha) < 6:
+        return Response(
+            {"detail": "A nova senha deve conter pelo menos 6 caracteres."}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Criptografa e salva de forma nativa no Neon Postgres
+    usuario.set_password(nova_senha)
+    usuario.save()
+    
+    return Response(
+        {"detail": f"A senha do usuário '{usuario.username}' foi redefinida com sucesso!"}, 
+        status=status.HTTP_200_OK
+    )
+
+
 class MotoristaViewSet(viewsets.ModelViewSet):
     queryset = Motorista.objects.all()
     serializer_class = MotoristaSerializer
